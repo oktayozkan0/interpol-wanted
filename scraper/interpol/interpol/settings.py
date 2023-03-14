@@ -1,0 +1,31 @@
+import os
+
+BOT_NAME = "interpol"
+
+SPIDER_MODULES = ["interpol.spiders"]
+NEWSPIDER_MODULE = "interpol.spiders"
+REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+FEED_EXPORT_ENCODING = "utf-8"
+ROBOTSTXT_OBEY = False
+ITEM_PIPELINES = {
+   "interpol.pipelines.RabbitMQPipeline": 300,
+}
+DOWNLOAD_DELAY = float(os.environ.get("DOWNLOAD_DELAY"))
+
+
+#USER_AGENT = "interpol (+http://www.yourdomain.com)"
+#CONCURRENT_REQUESTS = 32
+#CONCURRENT_REQUESTS_PER_DOMAIN = 16
+#CONCURRENT_REQUESTS_PER_IP = 16
+#COOKIES_ENABLED = False
+#AUTOTHROTTLE_ENABLED = True
+#AUTOTHROTTLE_START_DELAY = 5
+#AUTOTHROTTLE_MAX_DELAY = 60
+#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+#AUTOTHROTTLE_DEBUG = False
+#HTTPCACHE_ENABLED = True
+#HTTPCACHE_EXPIRATION_SECS = 0
+#HTTPCACHE_DIR = "httpcache"
+#HTTPCACHE_IGNORE_HTTP_CODES = []
+#HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"

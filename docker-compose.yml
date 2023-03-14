@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
+      - ${RABBITMQ_AMQP_PORT}:${RABBITMQ_AMQP_PORT}
+    networks:
+      - scrape_net
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+
+  mongodb:
+    image: mongo:4.2.3-bionic
+    container_name: mongodb
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_API_USER=${MONGO_API_USER}
+      - MONGO_API_PASS=${MONGO_API_PASS}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+    networks:
+      - scrape_net
+    volumes:
+      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+
+  scraper:
+    build: .\scraper\interpol
+    networks:
+      - scrape_net
+    env_file:
+      - .env
+    restart: always
+
+  web:
+    build: .\backend
+    networks:
+      - scrape_net
+    ports:
+      - 8001:8001
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_AMQP_PORT=${RABBITMQ_AMQP_PORT}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE}
+      - MONGO_API_USER=${MONGO_API_USER}
+      - MONGO_API_PASS=${MONGO_API_PASS}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+      - WAIT_AFTER_CONSUME=${WAIT_AFTER_CONSUME}
+
+networks:
+  scrape_net:
+    name: scrape_net
