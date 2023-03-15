@@ -6,15 +6,16 @@ import json
 
 
 class Rabbit:
+    host = "rabbitmq"
+    rabbit_user = os.environ.get("RABBITMQ_DEFAULT_USER")
+    rabbit_pass = os.environ.get("RABBITMQ_DEFAULT_PASS")
+    amqp_port = os.environ.get("RABBITMQ_AMQP_PORT")
+
     def __init__(self) -> None:
-        host = "rabbitmq"
-        rabbit_user = os.environ.get("RABBITMQ_DEFAULT_USER")
-        rabbit_pass = os.environ.get("RABBITMQ_DEFAULT_PASS")
-        amqp_port = os.environ.get("RABBITMQ_AMQP_PORT")
-        credentials = pika.PlainCredentials(rabbit_user,
-                                            rabbit_pass)
-        params = pika.ConnectionParameters(host,
-                                        amqp_port,
+        credentials = pika.PlainCredentials(self.rabbit_user,
+                                            self.rabbit_pass)
+        params = pika.ConnectionParameters(self.host,
+                                        self.amqp_port,
                                         "/",
                                         credentials)
         conn = pika.BlockingConnection(params)
