@@ -33,19 +33,20 @@ def to_mongo():
     WAIT_AFTER_CONSUME = os.environ.get("WAIT_AFTER_CONSUME")
     rabbit = Rabbit()
     mongo = DBMongo()
-    MONGO_COLLECTION = os.environ.get("MONGO_COLLECTION")
+    CRIMINALS_COLLECTION = os.environ.get("MONGO_COLLECTION")
     while True:
         data = rabbit.consume_data()
         database = mongo.get_db()
-        if data is None:
+        if not data:
             continue
         q_data = json.loads(data)
-        exist_data = list(database[MONGO_COLLECTION].find({"entity_id":q_data["entity_id"]}))
-        if exist_data != []:
+        exist_data = list(database[CRIMINALS_COLLECTION].find({"entity_id":q_data["entity_id"]}))
+
+        if not exist_data:
             continue
-        if data is not None:
-            database[MONGO_COLLECTION].insert_one(q_data)
+
+        if data:
+            database[CRIMINALS_COLLECTION].insert_one(q_data)
             time.sleep(float(WAIT_AFTER_CONSUME))
         else:
             time.sleep(15)
-

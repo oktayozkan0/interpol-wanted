@@ -11,6 +11,6 @@ app.include_router(routers.router)
 
 if __name__ == "__main__":
     time.sleep(20)
-    t = BackgroundTask()
-    t.start()
+    task = BackgroundTask()
+    task.start()
     uvicorn.run(app, host="0.0.0.0", port=8001)

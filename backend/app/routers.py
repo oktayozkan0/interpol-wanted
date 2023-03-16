@@ -18,9 +18,10 @@ def get_criminals(request: Request, params: Params = Depends()):
     db = mongo_db.get_db()
     data = list(db[MONGO_COLLECTION].find({}, {"_id":0}))
     is_new_added = False
-    if int(request.cookies["item_length"]) < len(data):
+    item_length_cookie = request.cookies.get("item_length")
+    if item_length_cookie and int(item_length_cookie) < len(data):
         is_new_added = True
-    new_count = len(data) - int(request.cookies["item_length"])
+        new_count = len(data) - int(request.cookies["item_length"])
     response = templates.TemplateResponse(
         "base.html", 
             {"request":request,
