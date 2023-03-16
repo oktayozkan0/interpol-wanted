@@ -1,6 +1,6 @@
 import threading
 from consumer import to_mongo
 
-class BackgroundTask(threading.Thread):
+class BackgroundTasks(threading.Thread):
     def run(self,*args,**kwargs):
         to_mongo()

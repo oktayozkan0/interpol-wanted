@@ -6,16 +6,15 @@ import json
 
 
 class Rabbit:
-    host = "rabbitmq"
-    rabbit_user = os.environ.get("RABBITMQ_DEFAULT_USER")
-    rabbit_pass = os.environ.get("RABBITMQ_DEFAULT_PASS")
-    amqp_port = os.environ.get("RABBITMQ_AMQP_PORT")
-
     def __init__(self) -> None:
-        credentials = pika.PlainCredentials(self.rabbit_user,
-                                            self.rabbit_pass)
-        params = pika.ConnectionParameters(self.host,
-                                        self.amqp_port,
+        host = "rabbitmq"
+        rabbit_user = os.environ.get("RABBITMQ_DEFAULT_USER")
+        rabbit_pass = os.environ.get("RABBITMQ_DEFAULT_PASS")
+        amqp_port = os.environ.get("RABBITMQ_AMQP_PORT")
+        credentials = pika.PlainCredentials(rabbit_user,
+                                            rabbit_pass)
+        params = pika.ConnectionParameters(host,
+                                        amqp_port,
                                         "/",
                                         credentials)
         conn = pika.BlockingConnection(params)
@@ -33,20 +32,19 @@ def to_mongo():
     WAIT_AFTER_CONSUME = os.environ.get("WAIT_AFTER_CONSUME")
     rabbit = Rabbit()
     mongo = DBMongo()
-    CRIMINALS_COLLECTION = os.environ.get("MONGO_COLLECTION")
+    MONGO_COLLECTION = os.environ.get("MONGO_COLLECTION")
     while True:
         data = rabbit.consume_data()
         database = mongo.get_db()
-        if not data:
+        if data is None:
             continue
         q_data = json.loads(data)
-        exist_data = list(database[CRIMINALS_COLLECTION].find({"entity_id":q_data["entity_id"]}))
-
-        if not exist_data:
+        exist_data = list(database[MONGO_COLLECTION].find({"entity_id":q_data["entity_id"]}))
+        if exist_data != []:
             continue
-
-        if data:
-            database[CRIMINALS_COLLECTION].insert_one(q_data)
+        if data is not None:
+            database[MONGO_COLLECTION].insert_one(q_data)
             time.sleep(float(WAIT_AFTER_CONSUME))
         else:
             time.sleep(15)
+

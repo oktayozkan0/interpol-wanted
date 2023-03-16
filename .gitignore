@@ -1,16 +1,12 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Scrapy stuff:
 .scrapy
 
-# PyBuilder
 .pybuilder/
 target/
 
-# Environments
 .venv
 env/
 venv/
